@@ -3,21 +3,22 @@ using Gtk;
 public class Gui : Window {
     public TreeView view;
     public TreeStore store;
+    public Frame frame2;
     public G3DMemory* memory;
     public Gui (ref G3DMemory memory) {
         this.memory = memory;
         this.title = "TreeView Sample";
-        set_default_size (250, 100);
+        set_default_size(640, 480);
         
-        var hpaned = new HPaned ();
-        var frame1 = new Frame (null);
-        var frame2 = new Frame (null);
+        var hpaned = new HPaned();
+        var frame1 = new Frame(null);
+        this.frame2 = new Frame(null);
         
         hpaned.add1(frame1);
-        hpaned.add2(frame2);
+        hpaned.add2(this.frame2);
         
         frame1.set_shadow_type(Gtk.ShadowType.IN);
-        frame2.set_shadow_type(Gtk.ShadowType.IN);
+        this.frame2.set_shadow_type(Gtk.ShadowType.IN);
         
         var scrolled = new ScrolledWindow(null, null);
         scrolled.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC);
@@ -37,10 +38,6 @@ public class Gui : Window {
         this.destroy.connect(Gtk.main_quit);
     }
     
-    public unowned G3DMemory get_memory() {
-        return this.memory;
-    }
-    
     public void changed() {
         var selection = this.view.get_selection();
         
@@ -57,12 +54,8 @@ public class Gui : Window {
             stdout.printf("selected index %s\n", this.memory->selected_thread);
             
             // TODO: call json from website to load images
-            var t1 = new FourChan.Thread(ref this.memory, this);
-            try {
-                Thread.create(t1.do_request, false);
-            } catch (ThreadError e) {
-                stderr.printf ("Error: %s\n", e.message);
-            }
+            var chan_thread = new FourChan.Thread(ref this.memory, this);
+            chan_thread.do_request();
             
         } else {
             stdout.printf("nothing selected\n");

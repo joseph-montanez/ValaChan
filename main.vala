@@ -15,6 +15,7 @@ public class Main : GLib.Object {
         }
         
         
+        
         Gtk.init(ref args);
 
         var sample = new Gui(ref mem);

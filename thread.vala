@@ -30,7 +30,6 @@ namespace FourChan {
                 var session = new Soup.SessionAsync();
                 var message = new Soup.Message("GET", url);
                 stdout.printf("Sending...\n");
-                session.timeout = 2;
                 session.send_message(message);
                 stdout.printf("Receiving...\n");
                 this.data = message.response_body.data;
@@ -56,13 +55,16 @@ namespace FourChan {
                     stdout.printf("Reading from File: %s\n", filename);
                     FileUtils.get_contents(filename, out this.data, out this.data_size);
                 } catch (GLib.FileError e) {
-                    stdout.printf("Holy shit batman, I cant write to donkey shit\n");
+                    stdout.printf("Holy shit batman, I cant write to donkey balls\n");
                 }
             }
         }
     }
 
-    public class Thread : Http {
+    public class Thread {
+        public string? data = null;
+        public size_t data_size = 0;
+        
         public G3DMemory* memory;
         public Gui* gui;
         
@@ -82,7 +84,10 @@ namespace FourChan {
             filename += ".json";
             
             var url = "http://www.gorilla3d.com/4chan/get-thread.php?threadId=" + this.memory->selected_thread;
-            this.url_get_contents(url, filename);
+            var http = new FourChan.Http();
+            http.url_get_contents(url, filename);
+            this.data = http.data;
+            this.data_size = http.data_size;
             
             
             if (this.data == null) {
