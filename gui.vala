@@ -57,6 +57,9 @@ public class Gui : Window {
             var chan_thread = new FourChan.Thread(ref this.memory, this);
             chan_thread.do_request();
             
+            foreach (var photo in this.memory->chan_thread.photos) {
+                stdout.printf ("Photo: %s\n", photo.filename);
+            }
         } else {
             stdout.printf("nothing selected\n");
         }

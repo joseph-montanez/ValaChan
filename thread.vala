@@ -73,6 +73,25 @@ namespace FourChan {
             this.gui = gui;
         }
         
+        public void* download_icon() {
+            // Data Directory
+            var chan_dir = FourChan.get_directory();
+            
+            // Open File | Why does this segfault on a single line!?
+            var filename = chan_dir;
+            filename += "/image-";
+            filename += this.memory->selected_thread;
+            filename += ".json";
+            
+            var url = "http://www.gorilla3d.com/4chan/get-thread.php?threadId=" + this.memory->selected_thread;
+            var http = new FourChan.Http();
+            http.url_get_contents(url, filename);
+            this.data = http.data;
+            this.data_size = http.data_size;
+            
+            return null;
+        }
+        
         public void* do_request() {
             // Data Directory
             var chan_dir = FourChan.get_directory();
@@ -120,16 +139,19 @@ namespace FourChan {
                 
                 var photos = photos_node.get_array();
                 if(photos != null) {
+
                     var photos_length = photos.get_length();
                     for (var i = 0; i < photos_length; i++) {
-                        var photo_node = photos.get_element(i).copy();
+                        var photo_node = photos.get_element(i).get_object();
                         var chan_photo = new ChanPhoto();
-                        chan_photo.filename = photo_node.get_string();
+                        
+                        chan_photo.filename = photo_node.get_member("filename").get_string();
                         chan_thread.photos.append(chan_photo);
                     }
                 }
                 
                 this.memory->threads.append(chan_thread);
+                this.memory->chan_thread = chan_thread;
             } else {
                 // Json got back, got back baby I say
                 stdout.printf("Yo, bro no valid json here\n");
